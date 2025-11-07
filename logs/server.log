@@ -1,0 +1,15 @@
+[2025-11-07T15:11:37.119Z] Server listening on http://localhost:4000
+[2025-11-07T15:11:37.968Z] Saved posters.json [1,3,5,4,7,9,12345]
+[2025-11-07T15:11:37.970Z] Added poster 12345
+[2025-11-07T15:11:37.979Z] Saved posters.json [1,3,5,4,7,9]
+[2025-11-07T15:11:37.980Z] Removed poster 12345 removedCount 1
+[2025-11-07T15:12:49.304Z] Saved posters.json [1,3,5,4,7,9,12]
+[2025-11-07T15:12:49.307Z] Added poster 12
+[2025-11-07T15:13:01.521Z] Saved posters.json [1,3,5,4,7,9,12,12345]
+[2025-11-07T15:13:01.523Z] Added poster 12345
+[2025-11-07T15:13:01.531Z] Saved posters.json [1,3,5,4,7,9,12]
+[2025-11-07T15:13:01.532Z] Removed poster 12345 removedCount 1
+[2025-11-07T15:15:56.618Z] Saved posters.json [1,3,5,4,7,9,12,12345]
+[2025-11-07T15:15:56.619Z] Added poster 12345
+[2025-11-07T15:15:56.626Z] Saved posters.json [1,3,5,4,7,9,12]
+[2025-11-07T15:15:56.627Z] Removed poster 12345 removedCount 1
