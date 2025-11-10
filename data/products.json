@@ -1,0 +1,220 @@
+{
+  "products": [
+    {
+      "id": "poster-nature-001",
+      "type": "poster",
+      "title": "Sunset Mountains",
+      "description": "Beautiful sunset over mountain peaks with warm golden colors. Perfect for living rooms and bedrooms.",
+      "price": {
+        "M": 299,
+        "L": 499,
+        "XL": 799
+      },
+      "images": ["images/pols1.jpg"],
+      "category": "nature",
+      "tags": ["sunset", "mountains", "warm", "landscape"],
+      "stock": {
+        "M": 50,
+        "L": 30,
+        "XL": 15
+      },
+      "dimensions": {
+        "M": "8x12 inches",
+        "L": "12x18 inches",
+        "XL": "16x24 inches"
+      },
+      "materials": "Matte/Glossy finish options",
+      "featured": true,
+      "created_at": "2025-01-01T00:00:00Z"
+    },
+    {
+      "id": "poster-street-002",
+      "type": "poster",
+      "title": "Urban Street Life",
+      "description": "Captivating black and white street photography capturing the essence of city life.",
+      "price": {
+        "M": 299,
+        "L": 499,
+        "XL": 799
+      },
+      "images": ["images/str.jpg"],
+      "category": "street",
+      "tags": ["black and white", "urban", "city", "street photography"],
+      "stock": {
+        "M": 40,
+        "L": 25,
+        "XL": 10
+      },
+      "dimensions": {
+        "M": "8x12 inches",
+        "L": "12x18 inches",
+        "XL": "16x24 inches"
+      },
+      "materials": "Matte/Glossy finish options",
+      "featured": true,
+      "created_at": "2025-01-01T00:00:00Z"
+    },
+    {
+      "id": "polaroid-abstract-003",
+      "type": "polaroid",
+      "title": "Abstract Dreams",
+      "description": "Colorful abstract composition with vibrant colors and flowing shapes.",
+      "price": {
+        "M": 199,
+        "L": 349,
+        "XL": 549
+      },
+      "images": ["images/pols3.png"],
+      "category": "abstract",
+      "tags": ["colorful", "abstract", "modern", "vibrant"],
+      "stock": {
+        "M": 35,
+        "L": 20,
+        "XL": 12
+      },
+      "dimensions": {
+        "M": "6x8 inches",
+        "L": "8x12 inches",
+        "XL": "12x16 inches"
+      },
+      "materials": "Glossy finish with white border",
+      "featured": false,
+      "created_at": "2025-01-01T00:00:00Z"
+    },
+    {
+      "id": "polaroid-portrait-004",
+      "type": "polaroid",
+      "title": "Portrait Moments",
+      "description": "Intimate portrait photography capturing authentic human emotions.",
+      "price": {
+        "M": 199,
+        "L": 349,
+        "XL": 549
+      },
+      "images": ["images/pol2.jpg"],
+      "category": "portrait",
+      "tags": ["portrait", "emotional", "black and white", "authentic"],
+      "stock": {
+        "M": 30,
+        "L": 18,
+        "XL": 8
+      },
+      "dimensions": {
+        "M": "6x8 inches",
+        "L": "8x12 inches",
+        "XL": "12x16 inches"
+      },
+      "materials": "Glossy finish with white border",
+      "featured": false,
+      "created_at": "2025-01-01T00:00:00Z"
+    },
+    {
+      "id": "poster-nature-005",
+      "type": "poster",
+      "title": "Forest Path",
+      "description": "Serene forest pathway with dappled sunlight filtering through trees.",
+      "price": {
+        "M": 299,
+        "L": 499,
+        "XL": 799
+      },
+      "images": ["images/pols1.jpg"],
+      "category": "nature",
+      "tags": ["forest", "nature", "green", "peaceful"],
+      "stock": {
+        "M": 45,
+        "L": 28,
+        "XL": 14
+      },
+      "dimensions": {
+        "M": "8x12 inches",
+        "L": "12x18 inches",
+        "XL": "16x24 inches"
+      },
+      "materials": "Matte/Glossy finish options",
+      "featured": true,
+      "created_at": "2025-01-01T00:00:00Z"
+    },
+    {
+      "id": "poster-street-006",
+      "type": "poster",
+      "title": "City Lights",
+      "description": "Night cityscape with dazzling lights and urban energy.",
+      "price": {
+        "M": 299,
+        "L": 499,
+        "XL": 799
+      },
+      "images": ["images/str.jpg"],
+      "category": "street",
+      "tags": ["night", "city lights", "urban", "colorful"],
+      "stock": {
+        "M": 38,
+        "L": 22,
+        "XL": 10
+      },
+      "dimensions": {
+        "M": "8x12 inches",
+        "L": "12x18 inches",
+        "XL": "16x24 inches"
+      },
+      "materials": "Matte/Glossy finish options",
+      "featured": false,
+      "created_at": "2025-01-01T00:00:00Z"
+    },
+    {
+      "id": "polaroid-abstract-007",
+      "type": "polaroid",
+      "title": "Geometric Patterns",
+      "description": "Modern geometric patterns with clean lines and bold colors.",
+      "price": {
+        "M": 199,
+        "L": 349,
+        "XL": 549
+      },
+      "images": ["images/pols3.png"],
+      "category": "abstract",
+      "tags": ["geometric", "modern", "patterns", "bold"],
+      "stock": {
+        "M": 25,
+        "L": 15,
+        "XL": 6
+      },
+      "dimensions": {
+        "M": "6x8 inches",
+        "L": "8x12 inches",
+        "XL": "12x16 inches"
+      },
+      "materials": "Glossy finish with white border",
+      "featured": false,
+      "created_at": "2025-01-01T00:00:00Z"
+    },
+    {
+      "id": "poster-portrait-008",
+      "type": "poster",
+      "title": "Cultural Heritage",
+      "description": "Traditional portrait celebrating cultural diversity and heritage.",
+      "price": {
+        "M": 299,
+        "L": 499,
+        "XL": 799
+      },
+      "images": ["images/pol2.jpg"],
+      "category": "portrait",
+      "tags": ["cultural", "traditional", "heritage", "diverse"],
+      "stock": {
+        "M": 32,
+        "L": 20,
+        "XL": 9
+      },
+      "dimensions": {
+        "M": "8x12 inches",
+        "L": "12x18 inches",
+        "XL": "16x24 inches"
+      },
+      "materials": "Matte/Glossy finish options",
+      "featured": true,
+      "created_at": "2025-01-01T00:00:00Z"
+    }
+  ]
+}
