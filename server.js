@@ -12,6 +12,9 @@ app.use(express.static(path.join(__dirname)));
 
 const DATA_DIR = path.join(__dirname, 'data');
 const POSTERS_FILE = path.join(DATA_DIR, 'posters.json');
+const PRODUCTS_FILE = path.join(DATA_DIR, 'products.json');
+const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
+const CUSTOMERS_FILE = path.join(DATA_DIR, 'customers.json');
 const LOG_DIR = path.join(__dirname, 'logs');
 const LOG_FILE = path.join(LOG_DIR, 'server.log');
 
