@@ -226,6 +226,301 @@ app.delete('/api/posters', requireAdmin, (req, res) => {
   res.json({ list: posters });
 });
 
+// === PRODUCT API ENDPOINTS ===
+
+// GET /api/products - Get all products with optional filtering
+app.get('/api/products', (req, res) => {
+  try {
+    const { category, type, featured, minPrice, maxPrice, search } = req.query;
+    let products = loadProducts();
+
+    // Apply filters
+    if (category) {
+      products = products.filter(p => p.category === category);
+    }
+    if (type) {
+      products = products.filter(p => p.type === type);
+    }
+    if (featured === 'true') {
+      products = products.filter(p => p.featured === true);
+    }
+    if (minPrice) {
+      const min = Number(minPrice);
+      if (!Number.isNaN(min)) {
+        products = products.filter(p => {
+          const prices = Object.values(p.price);
+          return Math.min(...prices) >= min;
+        });
+      }
+    }
+    if (maxPrice) {
+      const max = Number(maxPrice);
+      if (!Number.isNaN(max)) {
+        products = products.filter(p => {
+          const prices = Object.values(p.price);
+          return Math.min(...prices) <= max;
+        });
+      }
+    }
+    if (search) {
+      const searchTerm = search.toLowerCase();
+      products = products.filter(p =>
+        p.title.toLowerCase().includes(searchTerm) ||
+        p.description.toLowerCase().includes(searchTerm) ||
+        p.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+      );
+    }
+
+    res.json({
+      products,
+      total: products.length,
+      filters: { category, type, featured, minPrice, maxPrice, search }
+    });
+  } catch (err) {
+    log('Error fetching products', err.message || err);
+    res.status(500).json({ error: 'Unable to fetch products' });
+  }
+});
+
+// GET /api/products/:id - Get single product by ID
+app.get('/api/products/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const products = loadProducts();
+    const product = products.find(p => p.id === id);
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    res.json({ product });
+  } catch (err) {
+    log('Error fetching product', err.message || err);
+    res.status(500).json({ error: 'Unable to fetch product' });
+  }
+});
+
+// GET /api/products/search?q=query&category=type&size=price - Advanced search
+app.get('/api/products/search', (req, res) => {
+  try {
+    const { q: query, category, size } = req.query;
+    let products = loadProducts();
+
+    if (query) {
+      const searchTerm = query.toLowerCase();
+      products = products.filter(p =>
+        p.title.toLowerCase().includes(searchTerm) ||
+        p.description.toLowerCase().includes(searchTerm) ||
+        p.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+      );
+    }
+
+    if (category) {
+      products = products.filter(p => p.category === category);
+    }
+
+    if (size && ['M', 'L', 'XL'].includes(size.toUpperCase())) {
+      const sizeKey = size.toUpperCase();
+      products = products.filter(p => p.price[sizeKey] && p.stock[sizeKey] > 0);
+    }
+
+    res.json({
+      products: products.slice(0, 50), // Limit to 50 results
+      total: products.length,
+      query: { q: query, category, size }
+    });
+  } catch (err) {
+    log('Error searching products', err.message || err);
+    res.status(500).json({ error: 'Unable to search products' });
+  }
+});
+
+// POST /api/products - Add new product (admin only)
+app.post('/api/products', requireAdmin, (req, res) => {
+  try {
+    const productData = req.body;
+
+    // Validation
+    if (!productData.title || !productData.type || !productData.price) {
+      return res.status(400).json({ error: 'Missing required fields: title, type, price' });
+    }
+
+    if (!['poster', 'polaroid'].includes(productData.type)) {
+      return res.status(400).json({ error: 'Type must be either "poster" or "polaroid"' });
+    }
+
+    const products = loadProducts();
+
+    // Generate unique ID
+    const id = productData.id || `${productData.type}-${Date.now()}`;
+
+    // Check if ID already exists
+    if (products.find(p => p.id === id)) {
+      return res.status(400).json({ error: 'Product with this ID already exists' });
+    }
+
+    const newProduct = {
+      id,
+      type: productData.type,
+      title: productData.title,
+      description: productData.description || '',
+      price: productData.price,
+      images: productData.images || [],
+      category: productData.category || 'abstract',
+      tags: productData.tags || [],
+      stock: productData.stock || { M: 0, L: 0, XL: 0 },
+      dimensions: productData.dimensions || { M: '8x12 inches', L: '12x18 inches', XL: '16x24 inches' },
+      materials: productData.materials || 'Matte/Glossy finish options',
+      featured: productData.featured || false,
+      created_at: new Date().toISOString()
+    };
+
+    products.push(newProduct);
+    const saved = saveProducts(products);
+
+    if (!saved) {
+      return res.status(500).json({ error: 'Unable to save product' });
+    }
+
+    log('Added new product', newProduct.id, newProduct.title);
+    res.status(201).json({ product: newProduct });
+  } catch (err) {
+    log('Error adding product', err.message || err);
+    res.status(500).json({ error: 'Unable to add product' });
+  }
+});
+
+// PUT /api/products/:id - Update product (admin only)
+app.put('/api/products/:id', requireAdmin, (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    const products = loadProducts();
+    const productIndex = products.findIndex(p => p.id === id);
+
+    if (productIndex === -1) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    // Update product while preserving some fields
+    const updatedProduct = {
+      ...products[productIndex],
+      ...updateData,
+      id, // Ensure ID doesn't change
+      updated_at: new Date().toISOString()
+    };
+
+    products[productIndex] = updatedProduct;
+    const saved = saveProducts(products);
+
+    if (!saved) {
+      return res.status(500).json({ error: 'Unable to update product' });
+    }
+
+    log('Updated product', id, updatedProduct.title);
+    res.json({ product: updatedProduct });
+  } catch (err) {
+    log('Error updating product', err.message || err);
+    res.status(500).json({ error: 'Unable to update product' });
+  }
+});
+
+// DELETE /api/products/:id - Delete product (admin only)
+app.delete('/api/products/:id', requireAdmin, (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const products = loadProducts();
+    const productIndex = products.findIndex(p => p.id === id);
+
+    if (productIndex === -1) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    const deletedProduct = products[productIndex];
+    products.splice(productIndex, 1);
+
+    const saved = saveProducts(products);
+    if (!saved) {
+      return res.status(500).json({ error: 'Unable to delete product' });
+    }
+
+    log('Deleted product', id, deletedProduct.title);
+    res.json({ message: 'Product deleted successfully', deletedProduct });
+  } catch (err) {
+    log('Error deleting product', err.message || err);
+    res.status(500).json({ error: 'Unable to delete product' });
+  }
+});
+
+// === CART API ENDPOINTS ===
+
+// POST /api/cart - Save cart to session
+app.post('/api/cart', (req, res) => {
+  try {
+    const { cart } = req.body;
+
+    if (!Array.isArray(cart)) {
+      return res.status(400).json({ error: 'Cart must be an array' });
+    }
+
+    // Validate cart items
+    for (const item of cart) {
+      if (!item.product_id || !item.size || !item.quantity || !item.price) {
+        return res.status(400).json({ error: 'Invalid cart item structure' });
+      }
+    }
+
+    // Store cart in session (for simplicity, using session-like storage)
+    // In production, you'd use proper session storage
+    const sessionId = req.headers['x-session-id'] || 'default';
+    const cartFile = path.join(DATA_DIR, `cart_${sessionId}.json`);
+
+    fs.writeFileSync(cartFile, JSON.stringify({ cart, updated_at: new Date().toISOString() }, null, 2));
+
+    res.json({ success: true, message: 'Cart saved successfully' });
+  } catch (err) {
+    log('Error saving cart', err.message || err);
+    res.status(500).json({ error: 'Unable to save cart' });
+  }
+});
+
+// GET /api/cart - Retrieve cart from session
+app.get('/api/cart', (req, res) => {
+  try {
+    const sessionId = req.headers['x-session-id'] || 'default';
+    const cartFile = path.join(DATA_DIR, `cart_${sessionId}.json`);
+
+    if (!fs.existsSync(cartFile)) {
+      return res.json({ cart: [] });
+    }
+
+    const cartData = JSON.parse(fs.readFileSync(cartFile, 'utf8'));
+    res.json(cartData);
+  } catch (err) {
+    log('Error retrieving cart', err.message || err);
+    res.status(500).json({ error: 'Unable to retrieve cart' });
+  }
+});
+
+// DELETE /api/cart - Clear cart
+app.delete('/api/cart', (req, res) => {
+  try {
+    const sessionId = req.headers['x-session-id'] || 'default';
+    const cartFile = path.join(DATA_DIR, `cart_${sessionId}.json`);
+
+    if (fs.existsSync(cartFile)) {
+      fs.unlinkSync(cartFile);
+    }
+
+    res.json({ success: true, message: 'Cart cleared successfully' });
+  } catch (err) {
+    log('Error clearing cart', err.message || err);
+    res.status(500).json({ error: 'Unable to clear cart' });
+  }
+});
+
 // Serve kapoor.html for root explicitly (so visiting / shows the page)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'kapoor.html'));
