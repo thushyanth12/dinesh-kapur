@@ -521,6 +521,291 @@ app.delete('/api/cart', (req, res) => {
   }
 });
 
+// === ORDER MANAGEMENT API ENDPOINTS ===
+
+// POST /api/orders - Create new order
+app.post('/api/orders', async (req, res) => {
+  try {
+    const { customer, shippingAddress, paymentMethod, items, subtotal, shipping, total } = req.body;
+
+    // Validation
+    if (!customer || !shippingAddress || !paymentMethod || !items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'Missing required order information' });
+    }
+
+    // Validate customer information
+    if (!customer.firstName || !customer.lastName || !customer.email || !customer.phone) {
+      return res.status(400).json({ error: 'Missing required customer information' });
+    }
+
+    // Validate shipping address
+    if (!shippingAddress.line1 || !shippingAddress.city || !shippingAddress.state || !shippingAddress.pincode) {
+      return res.status(400).json({ error: 'Missing required shipping information' });
+    }
+
+    // Validate payment method
+    if (!['razorpay', 'bank_transfer'].includes(paymentMethod)) {
+      return res.status(400).json({ error: 'Invalid payment method' });
+    }
+
+    const orders = loadOrders();
+    const orderId = 'ORD-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5).toUpperCase();
+
+    const newOrder = {
+      id: orderId,
+      customer: {
+        name: `${customer.firstName} ${customer.lastName}`,
+        email: customer.email,
+        phone: customer.phone
+      },
+      items: items.map(item => ({
+        product_id: item.product_id,
+        title: item.title,
+        size: item.size,
+        quantity: item.quantity,
+        price: item.price
+      })),
+      subtotal: Number(subtotal) || 0,
+      shipping: Number(shipping) || 0,
+      total: Number(total) || 0,
+      currency: 'INR',
+      status: paymentMethod === 'bank_transfer' ? 'pending' : 'pending',
+      payment_method: paymentMethod,
+      payment_status: paymentMethod === 'bank_transfer' ? 'pending' : 'pending',
+      shipping_address: {
+        line1: shippingAddress.line1,
+        line2: shippingAddress.line2 || '',
+        city: shippingAddress.city,
+        state: shippingAddress.state,
+        pincode: shippingAddress.pincode
+      },
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    // Add Razorpay order ID for online payments
+    if (paymentMethod === 'razorpay') {
+      // In a real implementation, you would create a Razorpay order here
+      // For now, we'll generate a mock order ID
+      newOrder.razorpayOrderId = 'order_' + Date.now();
+    }
+
+    orders.push(newOrder);
+    const saved = saveOrders(orders);
+
+    if (!saved) {
+      return res.status(500).json({ error: 'Unable to save order' });
+    }
+
+    // Update product stock
+    try {
+      const products = loadProducts();
+      let stockUpdated = false;
+
+      items.forEach(orderItem => {
+        const productIndex = products.findIndex(p => p.id === orderItem.product_id);
+        if (productIndex >= 0) {
+          const product = products[productIndex];
+          if (product.stock && product.stock[orderItem.size] !== undefined) {
+            product.stock[orderItem.size] -= orderItem.quantity;
+            if (product.stock[orderItem.size] < 0) {
+              product.stock[orderItem.size] = 0;
+            }
+            stockUpdated = true;
+          }
+        }
+      });
+
+      if (stockUpdated) {
+        saveProducts(products);
+      }
+    } catch (stockError) {
+      log('Warning: Could not update product stock', stockError.message || stockError);
+    }
+
+    log('New order created', orderId, customer.email, 'Total:', newOrder.total);
+
+    res.status(201).json({
+      order: newOrder,
+      message: 'Order created successfully'
+    });
+
+  } catch (err) {
+    log('Error creating order', err.message || err);
+    res.status(500).json({ error: 'Unable to create order' });
+  }
+});
+
+// GET /api/orders/:id - Retrieve order details
+app.get('/api/orders/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const orders = loadOrders();
+    const order = orders.find(o => o.id === id);
+
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    res.json({ order });
+  } catch (err) {
+    log('Error fetching order', err.message || err);
+    res.status(500).json({ error: 'Unable to fetch order' });
+  }
+});
+
+// GET /api/orders - Get all orders (admin only)
+app.get('/api/orders', requireAdmin, (req, res) => {
+  try {
+    const { status, limit = 50, offset = 0 } = req.query;
+    let orders = loadOrders();
+
+    // Apply filters
+    if (status) {
+      orders = orders.filter(order => order.status === status);
+    }
+
+    // Sort by created date (newest first)
+    orders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    // Apply pagination
+    const paginatedOrders = orders.slice(Number(offset), Number(offset) + Number(limit));
+
+    res.json({
+      orders: paginatedOrders,
+      total: orders.length,
+      filters: { status, limit, offset }
+    });
+  } catch (err) {
+    log('Error fetching orders', err.message || err);
+    res.status(500).json({ error: 'Unable to fetch orders' });
+  }
+});
+
+// PUT /api/orders/:id - Update order status (admin only)
+app.put('/api/orders/:id', requireAdmin, (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, payment_status, tracking_number, notes } = req.body;
+
+    const orders = loadOrders();
+    const orderIndex = orders.findIndex(o => o.id === id);
+
+    if (orderIndex === -1) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    const order = orders[orderIndex];
+
+    // Update allowed fields
+    if (status && ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'].includes(status)) {
+      order.status = status;
+    }
+
+    if (payment_status && ['pending', 'paid', 'failed', 'refunded'].includes(payment_status)) {
+      order.payment_status = payment_status;
+    }
+
+    if (tracking_number) {
+      order.tracking_number = tracking_number;
+    }
+
+    if (notes) {
+      order.admin_notes = notes;
+    }
+
+    order.updated_at = new Date().toISOString();
+
+    orders[orderIndex] = order;
+    const saved = saveOrders(orders);
+
+    if (!saved) {
+      return res.status(500).json({ error: 'Unable to update order' });
+    }
+
+    log('Order updated', id, 'Status:', status || 'unchanged');
+
+    res.json({ order });
+  } catch (err) {
+    log('Error updating order', err.message || err);
+    res.status(500).json({ error: 'Unable to update order' });
+  }
+});
+
+// === PAYMENT PROCESSING ENDPOINTS ===
+
+// POST /api/payment/initiate - Initiate payment (Razorpay)
+app.post('/api/payment/initiate', async (req, res) => {
+  try {
+    const { orderId, amount, currency = 'INR' } = req.body;
+
+    if (!orderId || !amount) {
+      return res.status(400).json({ error: 'Missing required payment information' });
+    }
+
+    // In a real implementation, you would integrate with Razorpay API
+    // For now, we'll return a mock order ID
+    const razorpayOrderId = 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+    res.json({
+      razorpayOrderId,
+      amount: Number(amount),
+      currency,
+      key: process.env.RAZORPAY_KEY_ID || 'rzp_test_1DP5mmOlF5G5ag'
+    });
+
+  } catch (err) {
+    log('Error initiating payment', err.message || err);
+    res.status(500).json({ error: 'Unable to initiate payment' });
+  }
+});
+
+// POST /api/payment/verify - Verify payment completion
+app.post('/api/payment/verify', (req, res) => {
+  try {
+    const { orderId, razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+
+    if (!orderId || !razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+      return res.status(400).json({ error: 'Missing required payment verification data' });
+    }
+
+    // In a real implementation, you would verify the Razorpay signature
+    // For now, we'll simulate successful verification
+
+    const orders = loadOrders();
+    const orderIndex = orders.findIndex(o => o.id === orderId);
+
+    if (orderIndex === -1) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    const order = orders[orderIndex];
+    order.payment_status = 'paid';
+    order.status = 'confirmed';
+    order.payment_id = razorpay_payment_id;
+    order.updated_at = new Date().toISOString();
+
+    orders[orderIndex] = order;
+    const saved = saveOrders(orders);
+
+    if (!saved) {
+      return res.status(500).json({ error: 'Unable to update order payment status' });
+    }
+
+    log('Payment verified', orderId, 'Payment ID:', razorpay_payment_id);
+
+    res.json({
+      success: true,
+      order,
+      message: 'Payment verified successfully'
+    });
+
+  } catch (err) {
+    log('Error verifying payment', err.message || err);
+    res.status(500).json({ error: 'Unable to verify payment' });
+  }
+});
+
 // Serve kapoor.html for root explicitly (so visiting / shows the page)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'kapoor.html'));
