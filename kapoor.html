@@ -191,11 +191,16 @@
     // Duplicate images for seamless infinite scroll
     window.addEventListener('DOMContentLoaded', () => {
       const trail = document.getElementById('carouselTrail');
-      
+
       // Robustness: Only run the script if the carousel element exists on the page.
       if (trail) {
         // Duplicate the existing images to create a seamless loop
         trail.innerHTML += trail.innerHTML;
+      }
+
+      // Initialize cart counter
+      if (typeof shoppingCart !== 'undefined') {
+        shoppingCart.loadCart();
       }
     });
 
