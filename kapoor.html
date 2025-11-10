@@ -6,6 +6,7 @@
   <meta name="description" content="Order high-quality bulk posters from YourBrand. Custom designs, fast shipping, and unbeatable prices on orders of 100 or more.">
   <title>Bulk Posters | YourBrand</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="js/cart.js"></script>
 </head>
 <body>
 
@@ -25,14 +26,14 @@
       <nav class="nav-menu">
         <ul>
           <li><a href="/">Home</a></li>
-          <li><a href="/all-posters">All Posters</a></li>
-          <li><a href="/bulk">Bulk Posters</a></li>
+          <li><a href="/products">Shop</a></li>
+          <li><a href="/bulk">Bulk Orders</a></li>
           <li><a href="/contact">Contact</a></li>
         </ul>
       </nav>
       <div class="header-actions">
         <a href="/login">Login</a>
-        <a href="/cart">Cart</a>
+        <a href="/cart">Cart (<span id="cart-count">0</span>)</a>
       </div>
     </div>
   </header>
@@ -40,9 +41,12 @@
   <main class="main-content">
     <section class="hero-section">
       <div class="container">
-        <h1>Get Bulk Posters at the Best Prices!</h1>
-        <p>Save more with bulk orders — premium prints, custom designs, fast shipping.</p>
-  <a href="https://wa.me/918124125555" target="_blank" rel="noopener noreferrer" class="btn btn-cta">💬 Chat with us on WhatsApp</a>
+        <h1>Transform Your Space with Premium Prints</h1>
+        <p>Discover our collection of high-quality posters and polaroids — perfect for your home or office.</p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <a href="/products" class="btn btn-cta">🛍️ Shop Now</a>
+          <a href="https://wa.me/918124125555" target="_blank" rel="noopener noreferrer" class="btn btn-primary">💬 Chat on WhatsApp</a>
+        </div>
 
         <!-- Simple search UI integrated with backend -->
         <div style="margin-top:1rem;">
@@ -187,11 +191,16 @@
     // Duplicate images for seamless infinite scroll
     window.addEventListener('DOMContentLoaded', () => {
       const trail = document.getElementById('carouselTrail');
-      
+
       // Robustness: Only run the script if the carousel element exists on the page.
       if (trail) {
         // Duplicate the existing images to create a seamless loop
         trail.innerHTML += trail.innerHTML;
+      }
+
+      // Initialize cart counter
+      if (typeof shoppingCart !== 'undefined') {
+        shoppingCart.loadCart();
       }
     });
 

@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Browse our collection of premium posters and polaroids. High-quality prints in various sizes and styles.">
+  <title>Shop Products | YourBrand</title>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    /* Additional styles for product catalog */
+    .products-header {
+      text-align: center;
+      padding: 2rem 0;
+      background: #f9f9f9;
+      margin-bottom: 2rem;
+    }
+    .products-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .products-header p {
+      color: #666;
+      font-size: 1.1rem;
+    }
+
+    .filters-section {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      margin-bottom: 2rem;
+    }
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      align-items: end;
+    }
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+    }
+    .filter-group label {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+    .filter-group select,
+    .filter-group input {
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    .filter-actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: end;
+    }
+    .btn-filter {
+      padding: 0.75rem 1.5rem;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .btn-filter:hover {
+      background: var(--primary-hover);
+    }
+    .btn-clear {
+      background: #6c757d;
+      padding: 0.75rem 1.5rem;
+    }
+    .btn-clear:hover {
+      background: #5a6268;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .product-card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .product-image {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      background: #f8f8f8;
+    }
+
+    .product-info {
+      padding: 1.5rem;
+    }
+    .product-category {
+      font-size: 0.85rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+    }
+    .product-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #333;
+      line-height: 1.4;
+    }
+    .product-description {
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+
+    .product-price {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+
+    .product-sizes {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .size-option {
+      padding: 0.4rem 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.85rem;
+    }
+    .size-option:hover {
+      border-color: var(--primary-color);
+    }
+    .size-option.selected {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    .product-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .btn-add-cart {
+      flex: 1;
+      padding: 0.75rem;
+      background: #25D366;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    .btn-add-cart:hover {
+      background: #128C7E;
+    }
+    .btn-view-details {
+      padding: 0.75rem 1rem;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-view-details:hover {
+      background: #e9ecef;
+    }
+
+    .no-products {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+    }
+
+    .results-count {
+      margin-bottom: 1rem;
+      color: #666;
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+      }
+      .filters-grid {
+        grid-template-columns: 1fr;
+      }
+      .filter-actions {
+        flex-direction: column;
+        width: 100%;
+      }
+      .btn-filter,
+      .btn-clear {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo" aria-label="YourBrand Homepage">YourBrand</a>
+      <nav class="nav-menu">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/products" class="active">Shop</a></li>
+          <li><a href="/bulk">Bulk Orders</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <a href="/login">Login</a>
+        <a href="/cart" id="cart-link">Cart (<span id="cart-count">0</span>)</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="products-header">
+    <div class="container">
+      <h1>Shop Our Collection</h1>
+      <p>Discover premium posters and polaroids for your space</p>
+    </div>
+  </div>
+
+  <main class="main-content">
+    <div class="container">
+      <!-- Filters Section -->
+      <section class="filters-section">
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label for="category-filter">Category</label>
+            <select id="category-filter">
+              <option value="">All Categories</option>
+              <option value="nature">Nature</option>
+              <option value="street">Street</option>
+              <option value="abstract">Abstract</option>
+              <option value="portrait">Portrait</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="type-filter">Type</label>
+            <select id="type-filter">
+              <option value="">All Types</option>
+              <option value="poster">Posters</option>
+              <option value="polaroid">Polaroids</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="price-filter">Max Price</label>
+            <select id="price-filter">
+              <option value="">Any Price</option>
+              <option value="500">Under ₹500</option>
+              <option value="800">Under ₹800</option>
+              <option value="1000">Under ₹1000</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="search-input">Search</label>
+            <input type="text" id="search-input" placeholder="Search products...">
+          </div>
+
+          <div class="filter-actions">
+            <button class="btn-filter" onclick="applyFilters()">Apply Filters</button>
+            <button class="btn-filter btn-clear" onclick="clearFilters()">Clear</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results Count -->
+      <div class="results-count" id="results-count">
+        Loading products...
+      </div>
+
+      <!-- Products Grid -->
+      <section class="products-grid" id="products-grid">
+        <div class="loading">Loading products...</div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-columns">
+        <div class="footer-column">
+          <h4>About Us</h4>
+          <p>Welcome to YourBrand — designer posters and polaroids for your space.</p>
+        </div>
+        <div class="footer-column">
+          <h4>Quick links</h4>
+          <div class="footer-links">
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+            <a href="/terms">Terms</a>
+            <a href="/privacy">Privacy Policy</a>
+          </div>
+        </div>
+        <div class="footer-column">
+          <h4>Customer Service</h4>
+          <div class="footer-links">
+            <a href="/shipping">Shipping Info</a>
+            <a href="/returns">Returns</a>
+            <a href="/faq">FAQ</a>
+            <a href="/support">Support</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">&copy; 2025 YourBrand &nbsp; · &nbsp; All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    let products = [];
+    let selectedSizes = {};
+
+    // Load products on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadProducts();
+      loadCartCount();
+      setupEventListeners();
+    });
+
+    function setupEventListeners() {
+      // Search on enter key
+      document.getElementById('search-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          applyFilters();
+        }
+      });
+
+      // Auto-apply filters on change
+      ['category-filter', 'type-filter', 'price-filter'].forEach(id => {
+        document.getElementById(id).addEventListener('change', applyFilters);
+      });
+    }
+
+    async function loadProducts() {
+      try {
+        const response = await fetch('/api/products');
+        const data = await response.json();
+        products = data.products || [];
+        displayProducts(products);
+        updateResultsCount(products.length);
+      } catch (error) {
+        console.error('Error loading products:', error);
+        document.getElementById('products-grid').innerHTML =
+          '<div class="no-products">Error loading products. Please try again.</div>';
+      }
+    }
+
+    function displayProducts(productsToDisplay) {
+      const grid = document.getElementById('products-grid');
+
+      if (productsToDisplay.length === 0) {
+        grid.innerHTML = '<div class="no-products">No products found matching your criteria.</div>';
+        return;
+      }
+
+      grid.innerHTML = productsToDisplay.map(product => `
+        <div class="product-card" data-product-id="${product.id}">
+          <img src="${product.images[0] || '/images/placeholder.jpg'}" alt="${product.title}" class="product-image">
+
+          <div class="product-info">
+            <div class="product-category">${product.category}</div>
+            <h3 class="product-title">${product.title}</h3>
+            <p class="product-description">${product.description}</p>
+
+            <div class="product-price">
+              From ₹${Math.min(...Object.values(product.price))}
+            </div>
+
+            <div class="product-sizes" data-product-id="${product.id}">
+              ${Object.entries(product.price).map(([size, price]) => `
+                <button
+                  class="size-option ${size === 'M' ? 'selected' : ''}"
+                  data-size="${size}"
+                  data-price="${price}"
+                  onclick="selectSize('${product.id}', '${size}', ${price})"
+                >
+                  ${size} - ₹${price}
+                </button>
+              `).join('')}
+            </div>
+
+            <div class="product-actions">
+              <button
+                class="btn-add-cart"
+                onclick="addToCart('${product.id}', '${product.title}')"
+              >
+                Add to Cart
+              </button>
+              <a href="/product-detail.html?id=${product.id}" class="btn-view-details">
+                View Details
+              </a>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Initialize selected sizes
+      productsToDisplay.forEach(product => {
+        selectedSizes[product.id] = {
+          size: 'M',
+          price: product.price.M
+        };
+      });
+    }
+
+    function selectSize(productId, size, price) {
+      selectedSizes[productId] = { size, price };
+
+      // Update UI
+      const sizeContainer = document.querySelector(`.product-sizes[data-product-id="${productId}"]`);
+      sizeContainer.querySelectorAll('.size-option').forEach(btn => {
+        btn.classList.remove('selected');
+      });
+      sizeContainer.querySelector(`[data-size="${size}"]`).classList.add('selected');
+    }
+
+    async function addToCart(productId, productTitle) {
+      const selected = selectedSizes[productId];
+      if (!selected) {
+        alert('Please select a size');
+        return;
+      }
+
+      const cartItem = {
+        product_id: productId,
+        title: productTitle,
+        size: selected.size,
+        quantity: 1,
+        price: selected.price
+      };
+
+      try {
+        // Get current cart
+        const cartResponse = await fetch('/api/cart');
+        const cartData = await cartResponse.json();
+        let cart = cartData.cart || [];
+
+        // Check if item already exists
+        const existingItemIndex = cart.findIndex(item =>
+          item.product_id === productId && item.size === selected.size
+        );
+
+        if (existingItemIndex >= 0) {
+          cart[existingItemIndex].quantity += 1;
+        } else {
+          cart.push(cartItem);
+        }
+
+        // Save updated cart
+        await fetch('/api/cart', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ cart })
+        });
+
+        // Update cart counter
+        loadCartCount();
+
+        // Show success message
+        alert('Added to cart successfully!');
+      } catch (error) {
+        console.error('Error adding to cart:', error);
+        alert('Error adding to cart. Please try again.');
+      }
+    }
+
+    async function loadCartCount() {
+      try {
+        const response = await fetch('/api/cart');
+        const data = await response.json();
+        const cart = data.cart || [];
+        const count = cart.reduce((total, item) => total + item.quantity, 0);
+        document.getElementById('cart-count').textContent = count;
+      } catch (error) {
+        console.error('Error loading cart count:', error);
+      }
+    }
+
+    function applyFilters() {
+      const category = document.getElementById('category-filter').value;
+      const type = document.getElementById('type-filter').value;
+      const maxPrice = document.getElementById('price-filter').value;
+      const searchTerm = document.getElementById('search-input').value.toLowerCase();
+
+      let filtered = products;
+
+      if (category) {
+        filtered = filtered.filter(p => p.category === category);
+      }
+
+      if (type) {
+        filtered = filtered.filter(p => p.type === type);
+      }
+
+      if (maxPrice) {
+        filtered = filtered.filter(p => {
+          const prices = Object.values(p.price);
+          return Math.min(...prices) <= Number(maxPrice);
+        });
+      }
+
+      if (searchTerm) {
+        filtered = filtered.filter(p =>
+          p.title.toLowerCase().includes(searchTerm) ||
+          p.description.toLowerCase().includes(searchTerm) ||
+          p.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+        );
+      }
+
+      displayProducts(filtered);
+      updateResultsCount(filtered.length);
+    }
+
+    function clearFilters() {
+      document.getElementById('category-filter').value = '';
+      document.getElementById('type-filter').value = '';
+      document.getElementById('price-filter').value = '';
+      document.getElementById('search-input').value = '';
+
+      displayProducts(products);
+      updateResultsCount(products.length);
+    }
+
+    function updateResultsCount(count) {
+      const countElement = document.getElementById('results-count');
+      countElement.textContent = `Showing ${count} product${count !== 1 ? 's' : ''}`;
+    }
+  </script>
+</body>
+</html>

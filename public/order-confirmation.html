@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Order confirmation for YourBrand posters and polaroids">
+  <title>Order Confirmation | YourBrand</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="js/cart.js"></script>
+  <style>
+    /* Order Confirmation Styles */
+    .confirmation-container {
+      padding: 2rem 0;
+      min-height: 60vh;
+    }
+
+    .confirmation-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      background: #28a745;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 2.5rem;
+      color: white;
+    }
+
+    .confirmation-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+
+    .confirmation-header p {
+      color: #666;
+      font-size: 1.1rem;
+    }
+
+    .order-details {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .order-number {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 2rem;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .order-number strong {
+      color: var(--primary-color);
+    }
+
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #333;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--primary-color);
+    }
+
+    .order-items {
+      margin-bottom: 2rem;
+    }
+
+    .order-item {
+      display: grid;
+      grid-template-columns: 80px 1fr auto;
+      gap: 1rem;
+      padding: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+      align-items: center;
+    }
+
+    .order-item:last-child {
+      border-bottom: none;
+    }
+
+    .order-item-image {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #f8f8f8;
+    }
+
+    .order-item-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .order-item-title {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .order-item-meta {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .order-item-price {
+      font-weight: 600;
+      color: #333;
+      text-align: right;
+    }
+
+    .shipping-info {
+      margin-bottom: 2rem;
+    }
+
+    .address-block {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .address-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+
+    .address-text {
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .order-summary {
+      background: #f9f9f9;
+      padding: 1.5rem;
+      border-radius: 8px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .summary-row:last-child {
+      border-bottom: none;
+    }
+
+    .summary-row.total {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--primary-color);
+      padding-top: 1rem;
+      border-top: 2px solid #e0e0e0;
+      margin-top: 0.5rem;
+    }
+
+    .payment-status {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .payment-status.paid {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .payment-status.pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .next-steps {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .steps-list {
+      list-style: none;
+      counter-reset: step-counter;
+    }
+
+    .steps-list li {
+      counter-increment: step-counter;
+      margin-bottom: 1.5rem;
+      position: relative;
+      padding-left: 3rem;
+    }
+
+    .steps-list li::before {
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 2rem;
+      height: 2rem;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+
+    .actions-section {
+      text-align: center;
+      margin-top: 3rem;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: #f8f9fa;
+      color: #333;
+      border: 1px solid #dee2e6;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-secondary:hover {
+      background: #e9ecef;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 4rem;
+      color: #666;
+    }
+
+    .error {
+      text-align: center;
+      padding: 4rem;
+      color: #dc3545;
+    }
+
+    .bank-transfer-instructions {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .bank-transfer-instructions h3 {
+      color: #856404;
+      margin-bottom: 1rem;
+    }
+
+    .bank-details {
+      background: #fff;
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .bank-details strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+
+    .instructions {
+      color: #856404;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .order-item {
+        grid-template-columns: 60px 1fr;
+        gap: 0.75rem;
+      }
+
+      .order-item-image {
+        width: 60px;
+        height: 60px;
+        grid-row: span 2;
+      }
+
+      .order-item-price {
+        grid-column: span 2;
+        text-align: left;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        width: 100%;
+        max-width: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo" aria-label="YourBrand Homepage">YourBrand</a>
+      <nav class="nav-menu">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/products">Shop</a></li>
+          <li><a href="/bulk">Bulk Orders</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <a href="/login">Login</a>
+        <a href="/cart">Cart (<span id="cart-count">0</span>)</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container confirmation-container">
+      <div id="confirmation-content" class="loading">
+        Loading order confirmation...
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-columns">
+        <div class="footer-column">
+          <h4>About Us</h4>
+          <p>Welcome to YourBrand — designer posters and polaroids for your space.</p>
+        </div>
+        <div class="footer-column">
+          <h4>Quick links</h4>
+          <div class="footer-links">
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+            <a href="/terms">Terms</a>
+            <a href="/privacy">Privacy Policy</a>
+          </div>
+        </div>
+        <div class="footer-column">
+          <h4>Customer Service</h4>
+          <div class="footer-links">
+            <a href="/shipping">Shipping Info</a>
+            <a href="/returns">Returns</a>
+            <a href="/faq">FAQ</a>
+            <a href="/support">Support</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">&copy; 2025 YourBrand &nbsp; · &nbsp; All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    let order = null;
+    let paymentMethod = null;
+
+    // Load order confirmation on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadOrderConfirmation();
+    });
+
+    function getOrderIdFromUrl() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return {
+        id: urlParams.get('id'),
+        method: urlParams.get('method')
+      };
+    }
+
+    async function loadOrderConfirmation() {
+      const { id: orderId, method } = getOrderIdFromUrl();
+
+      if (!orderId) {
+        showError('Order ID not found');
+        return;
+      }
+
+      paymentMethod = method;
+
+      try {
+        const response = await fetch(`/api/orders/${orderId}`);
+
+        if (!response.ok) {
+          throw new Error('Order not found');
+        }
+
+        const data = await response.json();
+        order = data.order;
+
+        displayConfirmation();
+      } catch (error) {
+        console.error('Error loading order confirmation:', error);
+        showError('Order not found or error loading order details');
+      }
+    }
+
+    function displayConfirmation() {
+      const content = document.getElementById('confirmation-content');
+
+      const isPaid = order.payment_status === 'paid';
+      const isBankTransfer = paymentMethod === 'bank_transfer';
+
+      content.innerHTML = `
+        <div class="confirmation-header">
+          <div class="success-icon">${isPaid ? '✓' : '📋'}</div>
+          <h1>${isPaid ? 'Order Confirmed!' : 'Order Placed!'}</h1>
+          <p>${isPaid ? 'Thank you for your purchase. Your order has been confirmed and is being processed.' : 'Thank you for your order! Please complete the payment to confirm your order.'}</p>
+        </div>
+
+        ${isBankTransfer ? displayBankTransferInstructions() : ''}
+
+        <div class="order-details">
+          <div class="order-number">
+            Order Number: <strong>${order.id}</strong>
+            <div class="payment-status ${isPaid ? 'paid' : 'pending'}">
+              ${isPaid ? '✓ Payment Received' : '⏳ Awaiting Payment'}
+            </div>
+          </div>
+
+          <!-- Order Items -->
+          <div class="order-items">
+            <h3 class="section-title">Order Items</h3>
+            ${order.items.map(item => `
+              <div class="order-item">
+                <img src="/images/${item.product_id.split('-')[0]}${item.product_id.split('-')[1] === '001' ? '' : 's'}.jpg"
+                     alt="${item.title}"
+                     class="order-item-image"
+                     onerror="this.src='/images/placeholder.jpg'">
+                <div class="order-item-details">
+                  <div class="order-item-title">${item.title}</div>
+                  <div class="order-item-meta">Size: ${item.size} × ${item.quantity}</div>
+                </div>
+                <div class="order-item-price">
+                  ₹${item.price * item.quantity}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Shipping Information -->
+          <div class="shipping-info">
+            <h3 class="section-title">Shipping Information</h3>
+            <div class="address-block">
+              <div class="address-title">Customer Details</div>
+              <div class="address-text">
+                <strong>${order.customer.name}</strong><br>
+                ${order.customer.email}<br>
+                ${order.customer.phone}
+              </div>
+            </div>
+            <div class="address-block">
+              <div class="address-title">Delivery Address</div>
+              <div class="address-text">
+                ${order.shipping_address.line1}<br>
+                ${order.shipping_address.line2 ? order.shipping_address.line2 + '<br>' : ''}
+                ${order.shipping_address.city}, ${order.shipping_address.state}<br>
+                PIN: ${order.shipping_address.pincode}
+              </div>
+            </div>
+          </div>
+
+          <!-- Order Summary -->
+          <div class="order-summary">
+            <h3 class="section-title">Order Summary</h3>
+            <div class="summary-row">
+              <span>Subtotal (${order.items.reduce((total, item) => total + item.quantity, 0)} items)</span>
+              <span>₹${order.subtotal}</span>
+            </div>
+            <div class="summary-row">
+              <span>Shipping</span>
+              <span>${order.shipping === 0 ? 'FREE' : `₹${order.shipping}`}</span>
+            </div>
+            <div class="summary-row">
+              <span>Payment Method</span>
+              <span>${order.payment_method === 'razorpay' ? 'Online Payment' : 'Bank Transfer'}</span>
+            </div>
+            <div class="summary-row total">
+              <span>Total</span>
+              <span>₹${order.total}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="next-steps">
+          <h3 class="section-title">What's Next?</h3>
+          <ul class="steps-list">
+            ${isPaid ? `
+              <li>You'll receive an order confirmation email shortly with all the details</li>
+              <li>We'll process your order within 1-2 business days</li>
+              <li>You'll receive tracking information once your order ships</li>
+              <li>Expected delivery: 5-7 business days (depending on your location)</li>
+            ` : `
+              <li>Complete the bank transfer using the details provided above</li>
+              <li>Send payment confirmation to billing@yourbrand.com</li>
+              <li>We'll verify your payment and confirm your order</li>
+              <li>Order processing will begin after payment confirmation</li>
+            `}
+          </ul>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="actions-section">
+          <div class="action-buttons">
+            <a href="/products" class="btn-primary">Continue Shopping</a>
+            <a href="mailto:support@yourbrand.com?subject=Order ${order.id} - Question" class="btn-secondary">Contact Support</a>
+          </div>
+        </div>
+      `;
+    }
+
+    function displayBankTransferInstructions() {
+      return `
+        <div class="bank-transfer-instructions">
+          <h3>🏦 Complete Your Payment via Bank Transfer</h3>
+          <div class="instructions">
+            Please transfer the total amount to our bank account and send us the payment confirmation.
+          </div>
+          <div class="bank-details">
+            <strong>Bank Account Details:</strong>
+            <div><strong>Account Name:</strong> YourBrand Prints Pvt Ltd</div>
+            <div><strong>Account Number:</strong> 5020001234567890</div>
+            <div><strong>Bank Name:</strong> XYZ Bank</div>
+            <div><strong>Branch:</strong> Main Branch, Mumbai</div>
+            <div><strong>IFSC Code:</strong> XYZ0000000</div>
+          </div>
+          <div class="instructions">
+            <strong>Important:</strong>
+            <ul>
+              <li>Include your order number (${order.id}) in the payment remarks</li>
+              <li>Send payment screenshot/confirmation to billing@yourbrand.com</li>
+              <li>Your order will be processed once payment is verified</li>
+              <li>Payment verification typically takes 1-2 business hours</li>
+            </ul>
+          </div>
+        </div>
+      `;
+    }
+
+    function showError(message) {
+      const content = document.getElementById('confirmation-content');
+      content.innerHTML = `
+        <div class="error">
+          <h2>Error</h2>
+          <p>${message}</p>
+          <a href="/products" class="btn btn-primary">Continue Shopping</a>
+        </div>
+      `;
+    }
+
+    // Function to format date
+    function formatDate(dateString) {
+      const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      return new Date(dateString).toLocaleDateString('en-IN', options);
+    }
+  </script>
+</body>
+</html>
