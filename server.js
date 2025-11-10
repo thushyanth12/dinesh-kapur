@@ -51,6 +51,93 @@ function savePosters(arr) {
   }
 }
 
+// Product management functions
+function loadProducts() {
+  try {
+    const raw = fs.readFileSync(PRODUCTS_FILE, 'utf8');
+    const data = JSON.parse(raw);
+    return data.products || [];
+  } catch (err) {
+    log('Error loading products.json', err.message || err);
+    return [];
+  }
+}
+
+function saveProducts(products) {
+  try {
+    const data = { products };
+    fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(data, null, 2), 'utf8');
+    log('Saved products.json', `${products.length} products`);
+    return true;
+  } catch (err) {
+    log('Error writing products.json', err.message || err);
+    return false;
+  }
+}
+
+// Order management functions
+function loadOrders() {
+  try {
+    const raw = fs.readFileSync(ORDERS_FILE, 'utf8');
+    const data = JSON.parse(raw);
+    return data.orders || [];
+  } catch (err) {
+    log('Error loading orders.json', err.message || err);
+    return [];
+  }
+}
+
+function saveOrders(orders) {
+  try {
+    const data = { orders };
+    fs.writeFileSync(ORDERS_FILE, JSON.stringify(data, null, 2), 'utf8');
+    log('Saved orders.json', `${orders.length} orders`);
+    return true;
+  } catch (err) {
+    log('Error writing orders.json', err.message || err);
+    return false;
+  }
+}
+
+// Customer management functions
+function loadCustomers() {
+  try {
+    const raw = fs.readFileSync(CUSTOMERS_FILE, 'utf8');
+    const data = JSON.parse(raw);
+    return data.customers || [];
+  } catch (err) {
+    log('Error loading customers.json', err.message || err);
+    return [];
+  }
+}
+
+function saveCustomers(customers) {
+  try {
+    const data = { customers };
+    fs.writeFileSync(CUSTOMERS_FILE, JSON.stringify(data, null, 2), 'utf8');
+    log('Saved customers.json', `${customers.length} customers`);
+    return true;
+  } catch (err) {
+    log('Error writing customers.json', err.message || err);
+    return false;
+  }
+}
+
+// Initialize data files if they don't exist
+function initializeDataFiles() {
+  if (!fs.existsSync(PRODUCTS_FILE)) {
+    saveProducts([]);
+  }
+  if (!fs.existsSync(ORDERS_FILE)) {
+    saveOrders([]);
+  }
+  if (!fs.existsSync(CUSTOMERS_FILE)) {
+    saveCustomers([]);
+  }
+}
+
+initializeDataFiles();
+
 // POST /api/subscribe -> { email: string }
 app.post('/api/subscribe', (req, res) => {
   const { email } = req.body || {};
