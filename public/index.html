@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Trizoverse - Premium posters and custom prints. Transform your space with elegant designs.">
+  <title>Trizoverse - Premium Posters & Custom Prints</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="js/cart.js"></script>
+  <style>
+    /* Trizoverse Brand Header */
+    .tz-header {
+      background: #fff;
+      border-bottom: 1px solid #e5e5e5;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .tz-header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .tz-hamburger {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    .tz-hamburger:hover {
+      background: #f5f5f5;
+    }
+    .tz-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      text-decoration: none;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .tz-search {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex: 1;
+      max-width: 400px;
+      margin: 0 2rem;
+    }
+    .tz-search input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 1px solid #ddd;
+      border-radius: 24px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .tz-search input:focus {
+      border-color: #1a1a1a;
+    }
+    .tz-search button {
+      padding: 0.75rem 1.5rem;
+      background: #1a1a1a;
+      color: white;
+      border: none;
+      border-radius: 24px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    .tz-search button:hover {
+      background: #333;
+    }
+    .tz-cart-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #333;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .tz-cart-link:hover {
+      background: #f5f5f5;
+    }
+
+    /* Hamburger Menu */
+    .tz-menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 2000;
+      display: none;
+    }
+    .tz-menu-overlay.active {
+      display: block;
+    }
+    .tz-menu-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 320px;
+      height: 100%;
+      background: white;
+      box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 2001;
+      overflow-y: auto;
+    }
+    .tz-menu-overlay.active .tz-menu-sidebar {
+      transform: translateX(0);
+    }
+    .tz-menu-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid #e5e5e5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .tz-menu-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #333;
+    }
+    .tz-menu-content {
+      padding: 1.5rem;
+    }
+    .tz-menu-section {
+      margin-bottom: 2rem;
+    }
+    .tz-menu-section h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #1a1a1a;
+    }
+    .tz-menu-links {
+      list-style: none;
+      padding: 0;
+    }
+    .tz-menu-links li {
+      margin-bottom: 0.75rem;
+    }
+    .tz-menu-links a {
+      color: #666;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+      display: block;
+      padding: 0.5rem 0;
+    }
+    .tz-menu-links a:hover {
+      color: #1a1a1a;
+    }
+
+    /* Hero Section */
+    .tz-hero {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    }
+    .tz-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #1a1a1a;
+    }
+    .tz-hero p {
+      font-size: 1.25rem;
+      color: #666;
+      margin-bottom: 2rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Products Grid */
+    .tz-products-section {
+      padding: 3rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .tz-section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 3rem;
+      color: #1a1a1a;
+    }
+    .tz-products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+    .tz-product-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .tz-product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    }
+    .tz-product-image {
+      width: 100%;
+      height: 360px;
+      object-fit: cover;
+      background: #f5f5f5;
+    }
+    .tz-product-info {
+      padding: 1.5rem;
+    }
+    .tz-product-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #1a1a1a;
+    }
+    .tz-product-price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+    .tz-product-price .currency {
+      font-size: 1rem;
+      vertical-align: top;
+    }
+    .tz-offer-badge {
+      display: inline-block;
+      background: #ff6b6b;
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+
+    /* Loading State */
+    .tz-loading {
+      text-align: center;
+      padding: 4rem;
+      color: #666;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .tz-header-inner {
+        padding: 1rem;
+      }
+      .tz-brand {
+        font-size: 1.5rem;
+      }
+      .tz-search {
+        display: none;
+      }
+      .tz-hero h1 {
+        font-size: 2.5rem;
+      }
+      .tz-products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="tz-header">
+    <div class="tz-header-inner">
+      <button class="tz-hamburger" id="hamburger-btn" aria-label="Menu">☰</button>
+      <a href="/" class="tz-brand">Trizoverse</a>
+      <form class="tz-search" action="/products.html" method="GET" onsubmit="handleSearch(event)">
+        <input type="text" name="q" placeholder="Search posters..." id="search-input">
+        <button type="submit">Search</button>
+      </form>
+      <a href="/cart.html" class="tz-cart-link">
+        <span>Cart</span>
+        <span id="cart-count">0</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Hamburger Menu -->
+  <div class="tz-menu-overlay" id="menu-overlay">
+    <div class="tz-menu-sidebar">
+      <div class="tz-menu-header">
+        <span class="tz-brand" style="font-size: 1.5rem;">Trizoverse</span>
+        <button class="tz-menu-close" id="menu-close">×</button>
+      </div>
+      <div class="tz-menu-content">
+        <div class="tz-menu-section">
+          <h3>Collections</h3>
+          <ul class="tz-menu-links">
+            <li><a href="/products.html?category=nature">Nature</a></li>
+            <li><a href="/products.html?category=street">Street</a></li>
+            <li><a href="/products.html?category=abstract">Abstract</a></li>
+            <li><a href="/products.html?category=portrait">Portrait</a></li>
+          </ul>
+        </div>
+        <div class="tz-menu-section">
+          <h3>Shop</h3>
+          <ul class="tz-menu-links">
+            <li><a href="/products.html">All Products</a></li>
+            <li><a href="/products.html?type=poster">Posters</a></li>
+            <li><a href="/products.html?type=polaroid">Polaroids</a></li>
+            <li><a href="/products.html?featured=true">Featured</a></li>
+          </ul>
+        </div>
+        <div class="tz-menu-section">
+          <h3>More</h3>
+          <ul class="tz-menu-links">
+            <li><a href="/cart.html">Cart</a></li>
+            <li><a href="/checkout.html">Checkout</a></li>
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="tz-hero">
+    <h1>Transform Your Space</h1>
+    <p>Discover premium posters and custom prints that bring elegance and style to your walls</p>
+    <a href="/products.html" class="btn btn-cta">Explore Collection</a>
+  </section>
+
+  <!-- Featured Products -->
+  <section class="tz-products-section">
+    <h2 class="tz-section-title">Featured Posters</h2>
+    <div class="tz-products-grid" id="products-grid">
+      <div class="tz-loading">Loading products...</div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-columns">
+        <div class="footer-column">
+          <h4>About Trizoverse</h4>
+          <p>Welcome to Trizoverse where creativity meets artistry in the form of stunning customized and designer posters.</p>
+        </div>
+        <div class="footer-column">
+          <h4>Quick links</h4>
+          <div class="footer-links">
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+            <a href="#terms">Terms</a>
+            <a href="#privacy">Privacy Policy</a>
+          </div>
+        </div>
+        <div class="footer-column">
+          <h4>Customer Service</h4>
+          <div class="footer-links">
+            <a href="#shipping">Shipping Info</a>
+            <a href="#returns">Returns</a>
+            <a href="#faq">FAQ</a>
+            <a href="#support">Support</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">&copy; 2025 Trizoverse &nbsp; · &nbsp; All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    // Hamburger Menu
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const menuOverlay = document.getElementById('menu-overlay');
+    const menuClose = document.getElementById('menu-close');
+
+    hamburgerBtn.addEventListener('click', () => {
+      menuOverlay.classList.add('active');
+    });
+
+    menuClose.addEventListener('click', () => {
+      menuOverlay.classList.remove('active');
+    });
+
+    menuOverlay.addEventListener('click', (e) => {
+      if (e.target === menuOverlay) {
+        menuOverlay.classList.remove('active');
+      }
+    });
+
+    // Search Handler
+    function handleSearch(event) {
+      const query = document.getElementById('search-input').value;
+      if (!query.trim()) {
+        event.preventDefault();
+        return false;
+      }
+      return true;
+    }
+
+    // Load Featured Products
+    async function loadFeaturedProducts() {
+      try {
+        const response = await fetch('/api/products?featured=true&limit=12');
+        const data = await response.json();
+        const products = data.products || [];
+
+        const grid = document.getElementById('products-grid');
+        
+        if (products.length === 0) {
+          grid.innerHTML = '<div class="tz-loading">No featured products available</div>';
+          return;
+        }
+
+        grid.innerHTML = products.map(product => {
+          const minPrice = Math.min(...Object.values(product.price));
+          const maxPrice = Math.max(...Object.values(product.price));
+          const priceDisplay = minPrice === maxPrice ? `₹${minPrice}` : `From ₹${minPrice}`;
+          
+          return `
+            <a href="/product-detail.html?id=${product.id}" class="tz-product-card">
+              <img src="${product.images[0] || '/images/placeholder.jpg'}" alt="${product.title}" class="tz-product-image">
+              <div class="tz-product-info">
+                <h3 class="tz-product-title">${product.title}</h3>
+                <div class="tz-product-price">${priceDisplay}</div>
+              </div>
+            </a>
+          `;
+        }).join('');
+      } catch (error) {
+        console.error('Error loading products:', error);
+        document.getElementById('products-grid').innerHTML = 
+          '<div class="tz-loading">Error loading products. Please try again.</div>';
+      }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      loadFeaturedProducts();
+      if (typeof shoppingCart !== 'undefined') {
+        shoppingCart.loadCart();
+      }
+    });
+  </script>
+</body>
+</html>
+

@@ -384,21 +384,18 @@
   </style>
 </head>
 <body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="/" class="logo" aria-label="YourBrand Homepage">YourBrand</a>
-      <nav class="nav-menu">
-        <ul>
-          <li><a href="/">Home</a></li>
-          <li><a href="/products">Shop</a></li>
-          <li><a href="/bulk">Bulk Orders</a></li>
-          <li><a href="/contact">Contact</a></li>
-        </ul>
-      </nav>
-      <div class="header-actions">
-        <a href="/login">Login</a>
-        <a href="/cart">Cart (<span id="cart-count">0</span>)</a>
-      </div>
+  <header class="tz-header">
+    <div class="tz-header-inner">
+      <button class="tz-hamburger" onclick="window.location.href='/products.html'" aria-label="Menu">☰</button>
+      <a href="/" class="tz-brand">Trizoverse</a>
+      <form class="tz-search" action="/products.html" method="GET" onsubmit="handleSearch(event)">
+        <input type="text" name="q" placeholder="Search posters..." id="search-input">
+        <button type="submit">Search</button>
+      </form>
+      <a href="/cart.html" class="tz-cart-link">
+        <span>Cart</span>
+        <span id="cart-count">0</span>
+      </a>
     </div>
   </header>
 
@@ -414,8 +411,8 @@
     <div class="footer-inner">
       <div class="footer-columns">
         <div class="footer-column">
-          <h4>About Us</h4>
-          <p>Welcome to YourBrand — designer posters and polaroids for your space.</p>
+          <h4>About Trizoverse</h4>
+          <p>Welcome to Trizoverse where creativity meets artistry in the form of stunning customized and designer posters.</p>
         </div>
         <div class="footer-column">
           <h4>Quick links</h4>
@@ -436,21 +433,102 @@
           </div>
         </div>
       </div>
-      <div class="footer-bottom">&copy; 2025 YourBrand &nbsp; · &nbsp; All rights reserved.</div>
+      <div class="footer-bottom">&copy; 2025 Trizoverse &nbsp; · &nbsp; All rights reserved.</div>
     </div>
   </footer>
 
+  <script src="js/cart.js"></script>
   <script>
     let product = null;
     let selectedSize = null;
     let selectedPrice = 0;
     let quantity = 1;
+    let customImageUrl = null;
 
     // Load product on page load
     document.addEventListener('DOMContentLoaded', () => {
       loadProduct();
       loadCartCount();
+      loadOffers();
     });
+
+    function handleSearch(event) {
+      const query = document.getElementById('search-input').value;
+      if (!query.trim()) {
+        event.preventDefault();
+        return false;
+      }
+      return true;
+    }
+
+    async function loadOffers() {
+      try {
+        const response = await fetch('/api/offers');
+        const data = await response.json();
+        const offers = data.offers || [];
+        
+        const offersList = document.getElementById('offers-list');
+        if (offers.length === 0) {
+          offersList.innerHTML = 'No active offers at the moment.';
+          return;
+        }
+        
+        offersList.innerHTML = offers.map(offer => 
+          `<div style="margin-bottom: 0.5rem;">✓ ${offer.label}</div>`
+        ).join('');
+      } catch (error) {
+        console.error('Error loading offers:', error);
+      }
+    }
+
+    async function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size must be less than 5MB');
+        return;
+      }
+
+      // Validate file type
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+        alert('Please upload a JPEG, PNG, or WEBP image');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const response = await fetch('/api/uploads', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error('Upload failed');
+        }
+
+        const data = await response.json();
+        customImageUrl = data.fileUrl;
+        
+        // Show preview
+        const preview = document.getElementById('upload-preview');
+        const img = document.getElementById('uploaded-image');
+        img.src = customImageUrl;
+        preview.style.display = 'block';
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        alert('Failed to upload image. Please try again.');
+      }
+    }
+
+    function removeUploadedImage() {
+      customImageUrl = null;
+      document.getElementById('upload-preview').style.display = 'none';
+      document.getElementById('custom-image-upload').value = '';
+    }
 
     function getProductIdFromUrl() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -536,6 +614,26 @@
                   </div>
                 `).join('')}
               </div>
+            </div>
+
+            <!-- Upload Your Image (Customization) -->
+            <div class="custom-upload-section" style="background: #f9f9f9; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+              <h3 style="margin-bottom: 1rem; font-size: 1.1rem; font-weight: 600;">Customize Your Poster</h3>
+              <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">Upload your own image to create a custom poster</p>
+              <input type="file" id="custom-image-upload" accept="image/jpeg,image/png,image/webp" style="display: none;" onchange="handleImageUpload(event)">
+              <button type="button" onclick="document.getElementById('custom-image-upload').click()" style="padding: 0.75rem 1.5rem; background: #1a1a1a; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                Upload Image
+              </button>
+              <div id="upload-preview" style="margin-top: 1rem; display: none;">
+                <img id="uploaded-image" src="" alt="Uploaded image" style="max-width: 200px; max-height: 200px; border-radius: 8px; margin-bottom: 0.5rem;">
+                <button type="button" onclick="removeUploadedImage()" style="padding: 0.5rem 1rem; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Remove</button>
+              </div>
+            </div>
+
+            <!-- Offers Display -->
+            <div id="offers-section" style="background: #fff3cd; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #ffc107;">
+              <div style="font-weight: 600; margin-bottom: 0.5rem; color: #856404;">Special Offers</div>
+              <div id="offers-list" style="font-size: 0.9rem; color: #856404;">Loading offers...</div>
             </div>
 
             <!-- Quantity and Add to Cart -->
@@ -665,7 +763,8 @@
         title: product.title,
         size: selectedSize,
         quantity: quantity,
-        price: selectedPrice
+        price: selectedPrice,
+        custom_artwork: customImageUrl || null
       };
 
       try {

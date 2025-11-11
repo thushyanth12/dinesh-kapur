@@ -1,15 +1,77 @@
-# Kapoor Site - Simple Node Backend
+# Trizoverse - Premium Poster Store
 
-This repository contains the static frontend files (kapoor.html, styles.css, images/) and a minimal Node/Express backend to serve them and provide a tiny API for the sample posters data.
+A complete e-commerce platform for selling premium posters and custom prints. Built with Node.js/Express backend and vanilla HTML/CSS/JavaScript frontend.
 
-## What I added
+## Features
 
-- `package.json` - minimal manifest (includes express dependency).
-- `server.js` - Express server that:
-  - Serves static files from the project root (so `kapoor.html`, `styles.css`, and `images/` are served)
-  - GET `/api/list` — returns the posters array
-  - GET `/api/search?key=NUMBER` — returns `{ index: <number> }` where index is position or -1
-  - POST `/api/search` — accepts JSON `{ key: number }` and returns `{ index }`
+- **Elegant Branding**: Professional Trizoverse brand header with hamburger menu and search
+- **Product Catalog**: Browse featured posters with pricing and details
+- **Product Details**: View product specifications, select sizes, and customize with your own images
+- **Shopping Cart**: Add items to cart with localStorage persistence
+- **Checkout**: Secure checkout with GPay/UPI and Paytm payment integration
+- **Custom Uploads**: Upload your own images to create custom posters
+- **Offers System**: Display active offers and discounts
+- **Responsive Design**: Mobile-friendly interface
+
+## Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```env
+# Server Configuration
+PORT=3000
+BASE_URL=http://localhost:3000
+
+# Admin API Key (for protected endpoints)
+ADMIN_API_KEY=change-me
+
+# UPI Payment Configuration
+UPI_VPA=your-merchant@upi
+UPI_NAME=Trizoverse
+
+# Paytm Payment Gateway Configuration
+PAYTM_MID=YOUR_MERCHANT_ID
+PAYTM_MERCHANT_KEY=YOUR_MERCHANT_KEY
+PAYTM_WEBSITE=DEFAULT
+PAYTM_ENV=staging
+PAYTM_CALLBACK_URL=http://localhost:3000/payments/paytm/webhook
+
+# File Upload Configuration
+UPLOAD_LIMIT_BYTES=5242880
+```
+
+**Note**: Get Paytm credentials from [Paytm Merchant Dashboard](https://dashboard.paytm.com/)
+
+## API Endpoints
+
+### Products
+- `GET /api/products` - Get all products (supports query params: `featured`, `category`, `type`, `search`, `limit`)
+- `GET /api/products/:id` - Get product details
+- `POST /api/products` - Create product (admin only)
+- `PUT /api/products/:id` - Update product (admin only)
+- `DELETE /api/products/:id` - Delete product (admin only)
+
+### Offers
+- `GET /api/offers` - Get active offers
+
+### Cart
+- `GET /api/cart` - Get cart items
+- `POST /api/cart` - Save cart items
+- `DELETE /api/cart` - Clear cart
+
+### Orders
+- `POST /api/orders` - Create new order
+- `GET /api/orders/:id` - Get order details
+- `GET /api/orders` - Get all orders (admin only)
+- `PUT /api/orders/:id` - Update order (admin only)
+
+### Uploads
+- `POST /api/uploads` - Upload custom image (max 5MB, JPEG/PNG/WEBP)
+
+### Payments
+- `POST /payments/upi/confirm` - Confirm UPI payment
+- `POST /payments/paytm/create` - Create Paytm transaction
+- `POST /payments/paytm/webhook` - Paytm payment webhook
 
 ## Run (PowerShell)
 
@@ -34,6 +96,12 @@ npm start
 4. Open the site in your browser:
 
 http://localhost:3000/
+
+The homepage will display featured products. Navigate to:
+- `/products.html` - Browse all products
+- `/product-detail.html?id=PRODUCT_ID` - View product details
+- `/cart.html` - View shopping cart
+- `/checkout.html` - Complete checkout
 
 ## API examples
 

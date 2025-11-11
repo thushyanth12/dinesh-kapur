@@ -1,0 +1,35 @@
+{
+  "offers": [
+    {
+      "id": "free-shipping",
+      "label": "Free Shipping on Prepaid Orders",
+      "type": "flat",
+      "value": 79,
+      "active": true,
+      "conditions": {
+        "minSubtotal": 999
+      }
+    },
+    {
+      "id": "welcome-discount",
+      "label": "10% Off on First Order",
+      "type": "percentage",
+      "value": 10,
+      "active": true,
+      "conditions": {
+        "minSubtotal": 500
+      }
+    },
+    {
+      "id": "bulk-discount",
+      "label": "15% Off on Orders Above ₹2000",
+      "type": "percentage",
+      "value": 15,
+      "active": true,
+      "conditions": {
+        "minSubtotal": 2000
+      }
+    }
+  ]
+}
+

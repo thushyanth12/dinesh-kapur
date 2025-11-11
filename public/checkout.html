@@ -7,7 +7,7 @@
   <title>Checkout | YourBrand</title>
   <link rel="stylesheet" href="../styles.css">
   <script src="js/cart.js"></script>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <!-- Paytm Checkout JS will be loaded dynamically based on merchant ID -->
   <style>
     /* Checkout Styles */
     .checkout-container {
@@ -680,34 +680,37 @@
               <div class="form-section">
                 <h3>Payment Method</h3>
                 <div class="payment-methods">
-                  <div class="payment-method selected" onclick="selectPaymentMethod('razorpay')">
+                  <div class="payment-method selected" onclick="selectPaymentMethod('upi')">
                     <div class="payment-method-header">
-                      <input type="radio" name="paymentMethod" value="razorpay" checked>
-                      <span class="payment-method-title">UPI, Credit/Debit Card, Net Banking</span>
+                      <input type="radio" name="paymentMethod" value="upi" checked>
+                      <span class="payment-method-title">GPay / UPI</span>
                     </div>
                     <div class="payment-method-description">
-                      Secure payment via Razorpay. Supports all major payment methods.
+                      Pay using GPay, PhonePe, Paytm, or any UPI app. Scan QR code or use UPI link.
                     </div>
                   </div>
 
-                  <div class="payment-method" onclick="selectPaymentMethod('bank_transfer')">
+                  <div class="payment-method" onclick="selectPaymentMethod('paytm')">
                     <div class="payment-method-header">
-                      <input type="radio" name="paymentMethod" value="bank_transfer">
-                      <span class="payment-method-title">Bank Transfer</span>
+                      <input type="radio" name="paymentMethod" value="paytm">
+                      <span class="payment-method-title">Paytm</span>
                     </div>
                     <div class="payment-method-description">
-                      Transfer funds directly to our bank account. Order confirmation after payment verification.
+                      Secure payment via Paytm. Supports Paytm Wallet, UPI, Cards, and Net Banking.
                     </div>
                   </div>
                 </div>
 
-                <div id="bank-details" style="display: none;" class="bank-details">
-                  <strong>Bank Transfer Details:</strong>
-                  <div>Bank: XYZ Bank</div>
-                  <div>Account Name: YourBrand Prints</div>
-                  <div>Account Number: XXXXXXXXXX</div>
-                  <div>IFSC Code: XYZ0000000</div>
-                  <div>Please send payment confirmation to billing@yourbrand.com</div>
+                <div id="upi-payment-section" style="display: none; margin-top: 1.5rem; padding: 1.5rem; background: #f9f9f9; border-radius: 8px;">
+                  <h4 style="margin-bottom: 1rem; font-weight: 600;">UPI Payment</h4>
+                  <div id="upi-qr-container" style="text-align: center; margin-bottom: 1rem;">
+                    <p>Loading payment details...</p>
+                  </div>
+                  <div id="upi-link-container" style="text-align: center;">
+                    <a id="upi-link-btn" href="#" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: #1a1a1a; color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">Pay via UPI App</a>
+                  </div>
+                  <p style="margin-top: 1rem; font-size: 0.9rem; color: #666; text-align: center;">After payment, click "Confirm Payment" below</p>
+                  <button type="button" onclick="confirmUpiPayment()" style="margin-top: 1rem; padding: 0.75rem 1.5rem; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; width: 100%;">Confirm Payment</button>
                 </div>
               </div>
 
@@ -771,12 +774,12 @@
       document.querySelector(`[value="${method}"]`).closest('.payment-method').classList.add('selected');
       document.querySelector(`[value="${method}"]`).checked = true;
 
-      // Show/hide bank details
-      const bankDetails = document.getElementById('bank-details');
-      if (method === 'bank_transfer') {
-        bankDetails.style.display = 'block';
+      // Show/hide payment sections
+      const upiSection = document.getElementById('upi-payment-section');
+      if (method === 'upi') {
+        upiSection.style.display = 'block';
       } else {
-        bankDetails.style.display = 'none';
+        upiSection.style.display = 'none';
       }
     }
 
@@ -811,10 +814,10 @@
         };
 
         // Process payment
-        if (orderData.paymentMethod === 'razorpay') {
-          await processRazorpayPayment();
-        } else {
-          await processBankTransfer();
+        if (orderData.paymentMethod === 'upi') {
+          await processUpiPayment();
+        } else if (orderData.paymentMethod === 'paytm') {
+          await processPaytmPayment();
         }
 
       } catch (error) {
@@ -823,8 +826,10 @@
       }
     }
 
-    async function processRazorpayPayment() {
-      showProcessing('Initiating payment...');
+    let currentOrderId = null;
+
+    async function processUpiPayment() {
+      showProcessing('Creating order...');
 
       try {
         // Create order on backend
@@ -841,31 +846,28 @@
         }
 
         const orderResult = await orderResponse.json();
+        currentOrderId = orderResult.order.id;
 
-        // Initiate Razorpay payment
-        const options = {
-          key: 'rzp_test_1DP5mmOlF5G5ag', // Test key - replace with actual key in production
-          amount: orderData.total * 100, // Convert to paise
-          currency: 'INR',
-          name: 'YourBrand',
-          description: `Order #${orderResult.order.id}`,
-          order_id: orderResult.razorpayOrderId,
-          handler: async function (response) {
-            await verifyPayment(orderResult.order.id, response);
-          },
-          prefill: {
-            name: `${orderData.customer.firstName} ${orderData.customer.lastName}`,
-            email: orderData.customer.email,
-            contact: orderData.customer.phone
-          },
-          theme: {
-            color: '#25D366'
+        // Show UPI payment section
+        const upiSection = document.getElementById('upi-payment-section');
+        const qrContainer = document.getElementById('upi-qr-container');
+        const linkBtn = document.getElementById('upi-link-btn');
+
+        if (orderResult.payment && orderResult.payment.upi) {
+          if (orderResult.payment.upi.qrCode) {
+            qrContainer.innerHTML = `<img src="${orderResult.payment.upi.qrCode}" alt="UPI QR Code" style="max-width: 300px; border-radius: 8px;">`;
+          } else {
+            qrContainer.innerHTML = '<p>QR code will be generated after order confirmation</p>';
           }
-        };
 
-        const razorpay = new Razorpay(options);
+          if (orderResult.payment.upi.upiLink) {
+            linkBtn.href = orderResult.payment.upi.upiLink;
+            linkBtn.style.display = 'inline-block';
+          }
+        }
+
+        upiSection.style.display = 'block';
         hideProcessing();
-        razorpay.open();
 
       } catch (error) {
         hideProcessing();
@@ -873,64 +875,127 @@
       }
     }
 
-    async function processBankTransfer() {
+    async function confirmUpiPayment() {
+      const transactionId = prompt('Please enter your UPI transaction ID (e.g., UPI1234567890):');
+      if (!transactionId) return;
+
+      showProcessing('Confirming payment...');
+
       try {
-        // Create order with pending payment status
-        const orderResponse = await fetch('/api/orders', {
+        const confirmResponse = await fetch('/payments/upi/confirm', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            ...orderData,
-            paymentStatus: 'pending'
+            orderId: currentOrderId,
+            transactionId: transactionId,
+            amount: orderData.total
           })
+        });
+
+        if (!confirmResponse.ok) {
+          throw new Error('Payment confirmation failed');
+        }
+
+        const result = await confirmResponse.json();
+
+        // Clear cart and redirect to confirmation
+        await shoppingCart.clearCart();
+        hideProcessing();
+        window.location.href = `/order-confirmation.html?id=${currentOrderId}&method=upi`;
+
+      } catch (error) {
+        hideProcessing();
+        alert('Payment confirmation failed. Please contact support with your transaction ID.');
+      }
+    }
+
+    async function processPaytmPayment() {
+      showProcessing('Initiating Paytm payment...');
+
+      try {
+        // Create order on backend
+        const orderResponse = await fetch('/api/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(orderData)
         });
 
         if (!orderResponse.ok) {
           throw new Error('Failed to create order');
         }
 
-        const result = await orderResponse.json();
+        const orderResult = await orderResponse.json();
+        currentOrderId = orderResult.order.id;
 
-        // Show bank transfer instructions
-        window.location.href = `/order-confirmation.html?id=${result.order.id}&method=bank_transfer`;
-      } catch (error) {
-        throw error;
-      }
-    }
+        if (orderResult.payment && orderResult.payment.paytm) {
+          const paytmData = orderResult.payment.paytm;
 
-    async function verifyPayment(orderId, razorpayResponse) {
-      showProcessing('Verifying payment...');
+          // Initialize Paytm checkout
+          const config = {
+            root: '',
+            flow: 'DEFAULT',
+            data: {
+              orderId: paytmData.orderId,
+              token: paytmData.txnToken,
+              tokenType: 'TXN_TOKEN',
+              amount: paytmData.amount
+            },
+            handler: {
+              notifyMerchant: function(eventName, data) {
+                console.log('Paytm event:', eventName, data);
+              }
+            }
+          };
 
-      try {
-        const verifyResponse = await fetch('/api/payment/verify', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            orderId,
-            razorpay_payment_id: razorpayResponse.razorpay_payment_id,
-            razorpay_order_id: razorpayResponse.razorpay_order_id,
-            razorpay_signature: razorpayResponse.razorpay_signature
-          })
-        });
-
-        if (!verifyResponse.ok) {
-          throw new Error('Payment verification failed');
+          // Load Paytm Checkout JS dynamically
+          if (!window.Paytm) {
+            const script = document.createElement('script');
+            script.src = `https://securegw-stage.paytm.in/merchantpgpui/checkoutjs/merchants/${paytmData.mid}.js`;
+            script.crossOrigin = 'anonymous';
+            script.onload = function() {
+              if (window.Paytm && window.Paytm.CheckoutJS) {
+                window.Paytm.CheckoutJS.init(config).then(function onSuccess() {
+                  window.Paytm.CheckoutJS.invoke();
+                  hideProcessing();
+                }).catch(function onError(error) {
+                  hideProcessing();
+                  console.error('Paytm error:', error);
+                  alert('Failed to initialize Paytm payment. Please try again.');
+                });
+              }
+            };
+            script.onerror = function() {
+              hideProcessing();
+              // Fallback: redirect to Paytm payment page
+              const paytmUrl = `https://securegw-stage.paytm.in/theia/api/v1/showPaymentPage?mid=${paytmData.mid}&orderId=${paytmData.orderId}`;
+              window.location.href = paytmUrl;
+            };
+            document.head.appendChild(script);
+          } else if (window.Paytm.CheckoutJS) {
+            window.Paytm.CheckoutJS.init(config).then(function onSuccess() {
+              window.Paytm.CheckoutJS.invoke();
+              hideProcessing();
+            }).catch(function onError(error) {
+              hideProcessing();
+              console.error('Paytm error:', error);
+              alert('Failed to initialize Paytm payment. Please try again.');
+            });
+          } else {
+            // Fallback: redirect to Paytm payment page
+            const paytmUrl = `https://securegw-stage.paytm.in/theia/api/v1/showPaymentPage?mid=${paytmData.mid}&orderId=${paytmData.orderId}`;
+            window.location.href = paytmUrl;
+          }
+        } else {
+          throw new Error('Paytm payment data not available');
         }
 
-        const result = await verifyResponse.json();
-
-        // Clear cart and redirect to confirmation
-        await shoppingCart.clearCart();
-        hideProcessing();
-        window.location.href = `/order-confirmation.html?id=${orderId}&method=razorpay`;
-
       } catch (error) {
         hideProcessing();
-        showError('Payment verification failed. Please contact support.');
+        throw error;
       }
     }
 
