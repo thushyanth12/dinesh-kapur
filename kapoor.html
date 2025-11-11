@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Order high-quality bulk posters from YourBrand. Custom designs, fast shipping, and unbeatable prices on orders of 100 or more.">
-  <title>Bulk Posters | YourBrand</title>
+  <meta name="description" content="Order high-quality bulk posters from Trizoverse. Custom designs, fast shipping, and unbeatable prices on orders of 100 or more.">
+  <title>Premium Posters & Wall Art | Trizoverse</title>
   <link rel="stylesheet" href="styles.css">
   <script src="js/cart.js"></script>
 </head>
@@ -39,43 +39,60 @@
   </header>
 
   <main class="main-content">
+    <!-- Premium Hero Section -->
     <section class="hero-section">
       <div class="container">
-        <h1>Transform Your Space with Premium Prints</h1>
-        <p>Discover our collection of high-quality posters and polaroids — perfect for your home or office.</p>
-        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-          <a href="/products" class="btn btn-cta">🛍️ Shop Now</a>
-          <a href="https://wa.me/918124125555" target="_blank" rel="noopener noreferrer" class="btn btn-primary">💬 Chat on WhatsApp</a>
+        <div class="hero-content">
+          <h1>Transform Your Space with <span style="color: #e74c3c;">Premium Prints</span></h1>
+          <p>Discover our exclusive collection of museum-quality posters and vintage polaroids. Each piece tells a story, crafted to perfection for your home or office.</p>
+          <div class="hero-actions">
+            <a href="/products" class="btn btn-cta">
+              <span>🛍️ Shop Collection</span>
+            </a>
+            <a href="https://wa.me/918124125555" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+              <span>💬 Get Expert Advice</span>
+            </a>
+          </div>
         </div>
 
-        <!-- Simple search UI integrated with backend -->
-        <div style="margin-top:1rem;">
-          <label for="posterSearch">Search poster (enter number):</label>
-          <div style="display:flex;gap:.5rem;margin-top:.5rem;align-items:center">
-            <input id="posterSearch" type="number" placeholder="e.g. 7" style="padding:.5rem;border-radius:4px;border:1px solid #ccc;" />
-            <button id="posterSearchBtn" class="btn btn-primary">Search</button>
-            <div id="posterSearchResult" style="margin-left:1rem;font-weight:600"></div>
+        <!-- Features Showcase -->
+        <div class="hero-features">
+          <div class="feature-card">
+            <div class="feature-icon">🎨</div>
+            <h3>Premium Quality</h3>
+            <p>Museum-grade prints with archival longevity</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🚀</div>
+            <h3>Fast Delivery</h3>
+            <p>Free shipping on orders above ₹999</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🎁</div>
+            <h3>Custom Designs</h3>
+            <p>Personalized prints for your unique space</p>
           </div>
         </div>
-        
-        <!-- Admin: add/remove posters -->
-        <div style="margin-top:1.25rem;border-top:1px dashed #ddd;padding-top:1rem;">
-          <h4>Admin: Edit posters</h4>
-          <div style="margin-bottom:.5rem">
-            <label for="adminApiKeyInput">Admin API Key:</label>
-            <input id="adminApiKeyInput" type="text" placeholder="enter API key" style="padding:.4rem;border-radius:4px;border:1px solid #ccc;margin-left:.5rem" />
-            <small style="margin-left:.5rem;color:#666">(default: change-me)</small>
+      </div>
+    </section>
+
+    <!-- Premium Search Section -->
+    <section class="search-section">
+      <div class="container">
+        <div class="search-box">
+          <h2>Find Your Perfect Art</h2>
+          <div class="search-controls">
+            <input type="text" id="modernSearch" placeholder="Search for nature, abstract, street art..." class="search-input">
+            <button class="search-btn" onclick="performModernSearch()">Search</button>
           </div>
-          <div style="display:flex;gap:.5rem;align-items:center">
-            <input id="adminAddInput" type="number" placeholder="number to add" style="padding:.4rem;border-radius:4px;border:1px solid #ccc;" />
-            <button id="adminAddBtn" class="btn">Add</button>
-            <input id="adminRemoveInput" type="number" placeholder="number to remove" style="padding:.4rem;border-radius:4px;border:1px solid #ccc;margin-left:.5rem" />
-            <button id="adminRemoveBtn" class="btn">Remove</button>
+          <div class="search-suggestions">
+            <span>Popular: </span>
+            <a href="/products?search=nature">Nature</a>,
+            <a href="/products?search=abstract">Abstract</a>,
+            <a href="/products?search=street">Street</a>,
+            <a href="/products?search=vintage">Vintage</a>
           </div>
-          <div style="margin-top:.75rem">
-            <strong>Current posters:</strong>
-            <div id="adminPosterList" style="margin-top:.5rem;font-family:monospace"></div>
-          </div>
+          <div id="modernSearchResult" class="search-result"></div>
         </div>
       </div>
     </section>
@@ -331,11 +348,37 @@
       });
     })();
 
+    // Modern Search Function
+    function performModernSearch() {
+      const searchTerm = document.getElementById('modernSearch').value.trim();
+      const resultDiv = document.getElementById('modernSearchResult');
+
+      if (!searchTerm) {
+        resultDiv.textContent = 'Please enter a search term';
+        return;
+      }
+
+      // Redirect to products page with search query
+      window.location.href = `/products.html?search=${encodeURIComponent(searchTerm)}`;
+    }
+
+    // Enter key support for search
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('modernSearch');
+      if (searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            performModernSearch();
+          }
+        });
+      }
+    });
+
     // Floating WhatsApp
     (function(){
       const wa = document.createElement('a');
       wa.className = 'whatsapp-float';
-      wa.href = 'https://wa.me/918124125555?text=' + encodeURIComponent('Hello, I\'d like to enquire about bulk posters');
+      wa.href = 'https://wa.me/918124125555?text=' + encodeURIComponent('Hello, I\'d like to enquire about premium posters and wall art');
       wa.target = '_blank';
       wa.rel = 'noopener noreferrer';
   wa.innerHTML = '<svg viewBox="0 0 24 24" width="28" height="28" fill="#fff" xmlns="http://www.w3.org/2000/svg"><path d="M20.52 3.48A11.78 11.78 0 0012.03.25C6.01.25 1 5.26 1 11.28c0 1.98.52 3.9 1.51 5.6L.01 23.75l7.12-1.86a11.96 11.96 0 005.9 1.53h.01c6.02 0 11.03-5.01 11.03-11.03 0-3-1.18-5.78-3.25-7.61zM12.03 21.1h-.01c-1.77 0-3.5-.48-4.99-1.38l-.36-.21-4.23 1.1 1.15-4.12-.24-.38a8.77 8.77 0 01-1.35-4.62c0-4.86 3.95-8.81 8.81-8.81 2.36 0 4.58.92 6.24 2.59a8.8 8.8 0 012.59 6.22c0 4.86-3.95 8.81-8.81 8.81zm4.82-6.63c-.26-.13-1.53-.76-1.77-.85-.24-.09-.41-.13-.58.13-.17.26-.67.85-.82 1.02-.15.17-.31.19-.57.06-.26-.13-1.1-.4-2.09-1.28-.77-.68-1.29-1.52-1.44-1.78-.15-.26-.02-.39.12-.52.12-.12.26-.31.39-.46.13-.15.17-.26.26-.43.09-.17.04-.32-.02-.45-.06-.13-.58-1.4-.8-1.92-.21-.5-.43-.43-.58-.44-.15-.01-.33-.01-.51-.01-.18 0-.46.07-.7.33-.24.26-.9.88-.9 2.15 0 1.27.92 2.5 1.05 2.67.13.17 1.82 2.78 4.4 3.9 2.58 1.12 2.58.75 3.05.7.47-.05 1.53-.62 1.75-1.22.22-.6.22-1.11.15-1.22-.07-.11-.25-.17-.51-.3z"/></svg>';
