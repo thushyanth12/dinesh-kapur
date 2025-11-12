@@ -864,9 +864,15 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
 });
 
-app.listen(PORT, () => {
-  log(`Server listening on http://localhost:${PORT}`);
-});
+// PUT /api/products/:id - Update product (admin only)
+app.put('/api/products/:id', requireAdmin, (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    const products = loadProducts();
+    const productIndex = products.findIndex(p => p.id === id);
+
     if (productIndex === -1) {
       return res.status(404).json({ error: 'Product not found' });
     }
